@@ -16,6 +16,8 @@ Install with npm
   npm i react-material-symbols
 ```
 
+Requires React 18.2 or React 19 (`react` and `react-dom` are peer dependencies).
+
 ## Props
 
 #### `type MaterialSymbolProps`
