@@ -1,4 +1,4 @@
-import type { JSXElementConstructor, ComponentPropsWithoutRef } from 'react';
+import type { ComponentPropsWithRef, ComponentPropsWithoutRef } from 'react';
 import type { MaterialSymbolWeightArray, SymbolCodepointsArray } from './consts';
 
 /**
@@ -30,9 +30,19 @@ export type PolymorphicComponentProps<
 /**
  * Source: https://github.com/emotion-js/emotion/blob/master/packages/styled-base/types/helper.d.ts
  * A more precise version of just React.ComponentPropsWithoutRef on its own
+ *
+ * `React.JSX` is used rather than the global `JSX` namespace, which was removed in
+ * `@types/react` v19.
  */
-export type PropsOf<C extends keyof JSX.IntrinsicElements | JSXElementConstructor<unknown>> =
-	JSX.LibraryManagedAttributes<C, ComponentPropsWithoutRef<C>>;
+export type PropsOf<C extends React.ElementType> = React.JSX.LibraryManagedAttributes<
+	C,
+	ComponentPropsWithoutRef<C>
+>;
+
+/**
+ * The type of `ref` accepted by the element or component `C`.
+ */
+export type PolymorphicRef<C extends React.ElementType> = ComponentPropsWithRef<C>['ref'];
 
 /**
  * Allows for extending a set of props (`ExtendedProps`) by an overriding set of props
