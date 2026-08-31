@@ -79,7 +79,7 @@
   "description": "A simple package for adding Material Symbols to any React project.",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ed-software/react-material-symbols.git"
+    "url": "git+https://github.com/edjonesdev/react-material-symbols.git"
   },
   "keywords": [
     "Icons",
@@ -95,7 +95,7 @@
   },
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/ed-software/react-material-symbols/issues"
+    "url": "https://github.com/edjonesdev/react-material-symbols/issues"
   },
-  "homepage": "https://github.com/ed-software/react-material-symbols#readme"
+  "homepage": "https://github.com/edjonesdev/react-material-symbols#readme"
 }

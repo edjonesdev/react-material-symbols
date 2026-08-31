@@ -1,4 +1,4 @@
-# React Material Symbols ![NodeJS CI](https://github.com/ed-software/react-material-symbols/actions/workflows/ci.yml/badge.svg) ![Publish](https://github.com/ed-software/react-material-symbols/actions/workflows/publish.yml/badge.svg) ![Release](https://github.com/ed-software/react-material-symbols/actions/workflows/release.yml/badge.svg)
+# React Material Symbols ![NodeJS CI](https://github.com/edjonesdev/react-material-symbols/actions/workflows/ci.yml/badge.svg) ![Publish](https://github.com/edjonesdev/react-material-symbols/actions/workflows/publish.yml/badge.svg) ![Release](https://github.com/edjonesdev/react-material-symbols/actions/workflows/release.yml/badge.svg)
 
 A simple package for adding [Material Symbols](https://fonts.google.com/icons?icon.set=Material+Symbols) to any React project.
 
