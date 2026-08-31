@@ -1,18 +1,34 @@
 name: 'CI'
 
-on: push
+on:
+  push:
+    branches:
+      - main
+  pull_request:
 
-env:
-  NODE_VERSION: '18.12.1'
-
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  tests:
+  test:
+    name: Test (Node ${{ matrix.node-version }})
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [20, 22, 24]
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
+
+      - name: Setup Node ${{ matrix.node-version }}
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
 
       - name: Install dependencies
         run: npm ci
@@ -20,34 +36,68 @@ jobs:
       - name: Run tests
         run: npm test
 
+      - name: Typecheck
+        run: npm run typecheck
+
+      # The build was previously never exercised in CI, so packaging breakage
+      # only surfaced during a release.
+      - name: Build
+        run: npm run build
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
       - name: Check code format
         run: npm run prettier:check
 
-      - name: Check code format
+      - name: Check lint rules
         run: npm run eslint
 
   chromatic-deployment:
-    # Operating System
+    name: Chromatic
     runs-on: ubuntu-latest
-    # Job steps
+
+    # Chromatic is skipped entirely on forks and anywhere the token is unset,
+    # rather than failing the run.
     env:
-      HAS_CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+      HAS_CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN != '' }}
+
     steps:
-      - uses: actions/checkout@v1
-      - name: Setup Node ${{ env.NODE_VERSION }} Environment
-        uses: actions/setup-node@v2
+      - name: Checkout code
+        if: ${{ env.HAS_CHROMATIC_PROJECT_TOKEN == 'true' }}
+        uses: actions/checkout@v7
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          # Chromatic needs the full history to detect changes between builds.
+          fetch-depth: 0
+
+      - name: Setup Node
+        if: ${{ env.HAS_CHROMATIC_PROJECT_TOKEN == 'true' }}
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
           cache: npm
+
       - name: Install dependencies
-        if: ${{ env.HAS_CHROMATIC_PROJECT_TOKEN }}
-        # 👇 Install dependencies with the same package manager used in the project (replace it as needed), e.g. yarn, npm, pnpm
+        if: ${{ env.HAS_CHROMATIC_PROJECT_TOKEN == 'true' }}
         run: npm ci
-        # 👇 Adds Chromatic as a step in the workflow
+
       - name: Publish to Chromatic
-        if: ${{ env.HAS_CHROMATIC_PROJECT_TOKEN }}
-        uses: chromaui/action-next@v1
-        # Chromatic GitHub Action options
+        if: ${{ env.HAS_CHROMATIC_PROJECT_TOKEN == 'true' }}
+        uses: chromaui/action@v18
         with:
-          # 👇 Chromatic projectToken, refer to the manage page to obtain it.
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          exitZeroOnChanges: true
